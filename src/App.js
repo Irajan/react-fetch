@@ -1,25 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Profile from "./components/Profile";
+import Loading from "./components/Loading";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      loading: true,
+      name: { title: "", first: "", last: "" },
+      image: "",
+    };
+    this.getUser = this.getUser.bind(this);
+  }
+
+  componentWillMount() {
+    this.getUser();
+  }
+
+  async getUser() {
+    this.setState({ loading: true });
+    const response = await fetch("https://randomuser.me/api/");
+    const data = await response.json();
+
+    const fetchedName = data.results[0].name;
+    const fetchedImage = data.results[0].picture.large;
+
+    this.setState({ loading: false, name: fetchedName, image: fetchedImage });
+  }
+
+  render() {
+    return (
+      <>
+        {this.state.loading ? (
+          <Loading />
+        ) : (
+          <Profile
+            name={this.state.name}
+            image={this.state.image}
+            onClick={this.getUser}
+          />
+        )}
+      </>
+    );
+  }
 }
 
 export default App;
